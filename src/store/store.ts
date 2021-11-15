@@ -3,7 +3,8 @@ import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly'
 import type { Dispatch } from 'react'
 import * as reactRedux from 'react-redux'
 import mainReducer, { MainSlice, MainEvent } from './slices/main'
-import subsribeMiddleware from './effects/feed'
+import feedMiddleware from './effects/feed'
+import throttleMiddleware from './effects/throttler'
 
 // ...and this is a collection of the slices
 export type AppStore = {
@@ -25,5 +26,5 @@ export default createStore<Store, Event, {}, {}>(
   combineReducers({
     main: mainReducer
   }),
-  composeWithDevTools(applyMiddleware(subsribeMiddleware))
+  composeWithDevTools(applyMiddleware(feedMiddleware, throttleMiddleware))
 )

@@ -19,6 +19,7 @@ export type MainEvent =
   | { type: 'FEED_TOGGLED' }
   | { type: 'SNAPSHOT_UPDATE'; data: ApiSnapshotMsg }
   | { type: 'DELTA_UPDATE'; data: ApiDeltaMsg }
+  | { type: 'RENDER_TICK' }
 
 export type MainSlice = {
   productId: 'PI_XBTUSD' | 'PI_ETHUSD'
@@ -62,7 +63,6 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
           } else {
             draft.orderbook!.bids.set(order[0], order[1])
           }
-          draft.updateCounter++
         }
 
         for (const order of event.data.asks) {
@@ -71,9 +71,11 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
           } else {
             draft.orderbook!.asks.set(order[0], order[1])
           }
-          draft.updateCounter++
         }
         break
+
+      case 'RENDER_TICK':
+        draft.updateCounter++
 
       case 'FOCUSED':
         draft.state = 'connecting'

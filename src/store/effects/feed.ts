@@ -6,13 +6,26 @@ let webSocket: WebSocket
 const queue: (() => boolean)[] = []
 
 setInterval(() => {
-  if (queue.length && queue[0]()) {
+  while (queue.length && queue[0]()) {
     queue.shift()
   }
 }, 250)
 
 const middleware: Middleware<Store, Event> = (api) => (next) => (event) => {
-  if (event.type === 'INIT' || event.type === 'FOCUSED') {
+  if (
+    event.type === 'INIT' ||
+    event.type === 'FOCUSED' ||
+    event.type === 'FEED_TOGGLED'
+  ) {
+    queue.push(() => {
+      webSocket?.close?.()
+      return true
+    })
+
+    queue.push(() => {
+      return !webSocket?.close || webSocket?.readyState === webSocket.CLOSED
+    })
+
     queue.push(() => {
       webSocket = new WebSocket('wss://www.cryptofacilities.com/ws/v1')
       webSocket.onopen = function (event) {

@@ -9,14 +9,14 @@ import type {
   Price,
   Size
 } from 'src/store/types'
-import type { Modify } from 'src/util-types'
 import { AVLTree } from '@foxglove/avl'
 
 export type MainEvent =
   | { type: 'INIT' }
-  | { type: 'BLURRED' }
   | { type: 'CONNECTED' }
+  | { type: 'BLURRED' }
   | { type: 'FOCUSED' }
+  | { type: 'FEED_TOGGLED' }
   | { type: 'SNAPSHOT_UPDATE'; data: ApiSnapshotMsg }
   | { type: 'DELTA_UPDATE'; data: ApiDeltaMsg }
 
@@ -85,6 +85,11 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
 
       case 'CONNECTED':
         draft.state = 'live'
+        break
+
+      case 'FEED_TOGGLED':
+        draft.productId =
+          draft.productId === 'PI_XBTUSD' ? 'PI_ETHUSD' : 'PI_XBTUSD'
         break
     }
   })

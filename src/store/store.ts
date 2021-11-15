@@ -3,7 +3,7 @@ import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly'
 import type { Dispatch } from 'react'
 import * as reactRedux from 'react-redux'
 import mainReducer, { MainSlice, MainEvent } from './slices/main'
-import subsribeMiddleware from './effects/subscribe'
+import subsribeMiddleware from './effects/feed'
 
 // ...and this is a collection of the slices
 export type AppStore = {

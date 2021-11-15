@@ -15,6 +15,7 @@ import { AVLTree } from '@foxglove/avl'
 export type MainEvent =
   | { type: 'INIT' }
   | { type: 'BLURRED' }
+  | { type: 'CONNECTED' }
   | { type: 'FOCUSED' }
   | { type: 'SNAPSHOT_UPDATE'; data: ApiSnapshotMsg }
   | { type: 'DELTA_UPDATE'; data: ApiDeltaMsg }
@@ -23,7 +24,7 @@ export type MainSlice = {
   productId: 'PI_XBTUSD' | 'PI_ETHUSD'
   orderbook?: Orderbook
   updateCounter: number
-  state: 'idle' | 'live' | 'paused'
+  state: 'idle' | 'connecting' | 'live' | 'paused'
 }
 
 const initialState: MainSlice = {
@@ -72,14 +73,17 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
           }
           draft.updateCounter++
         }
+        break
 
+      case 'FOCUSED':
+        draft.state = 'connecting'
         break
 
       case 'BLURRED':
         draft.state = 'paused'
         break
 
-      case 'FOCUSED':
+      case 'CONNECTED':
         draft.state = 'live'
         break
     }

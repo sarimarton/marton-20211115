@@ -7,12 +7,12 @@ interface Props {
 }
 
 export default function OrderbookSpread(props: Props) {
-  // const feed = useSelector((root) => root.main.orderbook)
+  const feedState = useSelector((root) => root.main.state)
   const spread = useSelector(selectSpread)
-  // return feed === '' ? (
-  //   <></>
-  // ) : (
-  return (
+
+  return feedState !== 'live' ? (
+    <></>
+  ) : (
     <div
       className={`text-gray-600 sm:translate-x-[-50%] sm:left-1/2 mx-auto sm:transform sm:absolute ${props.className}`}
     >
@@ -20,5 +20,4 @@ export default function OrderbookSpread(props: Props) {
       {((spread.priceDiff * 100) / spread.price).toFixed(2)}%)
     </div>
   )
-  // )
 }

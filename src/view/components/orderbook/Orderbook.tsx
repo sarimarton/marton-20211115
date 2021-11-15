@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'src/store/store'
-import OrderbookFooter from './OrderbookFooter'
-import OrderbookHeader from './OrderbookHeader'
-import OrderbookSpread from './OrderbookSpread'
-import OrderbookBids from './OrderbookBids'
-import OrderbookAsks from './OrderbookAsks'
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'src/store/store';
+import OrderbookAsks from './OrderbookAsks';
+import OrderbookBids from './OrderbookBids';
+import OrderbookFooter from './OrderbookFooter';
+import OrderbookHeader from './OrderbookHeader';
+import OrderbookSpread from './OrderbookSpread';
 
 interface Props {}
 
@@ -13,7 +13,7 @@ export default function Orderbook({}: Props) {
   const state = useSelector((root) => root.main.state)
 
   useEffect(() => {
-    dispatch({ type: 'INIT' })
+    dispatch({ type: 'feed/CONNECT' })
   }, [])
 
   return (

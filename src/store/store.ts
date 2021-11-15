@@ -5,6 +5,8 @@ import * as reactRedux from 'react-redux'
 import mainReducer, { MainSlice, MainEvent } from './slices/main'
 import feedMiddleware from './effects/feed'
 import throttleMiddleware from './effects/throttler'
+import focusHandler from './effects/focusHandler'
+import toggleProductId from './effects/toggleProductId'
 
 // ...and this is a collection of the slices
 export type AppStore = {
@@ -26,5 +28,12 @@ export default createStore<Store, Event, {}, {}>(
   combineReducers({
     main: mainReducer
   }),
-  composeWithDevTools(applyMiddleware(feedMiddleware, throttleMiddleware))
+  composeWithDevTools(
+    applyMiddleware(
+      feedMiddleware,
+      throttleMiddleware,
+      focusHandler,
+      toggleProductId
+    )
+  )
 )

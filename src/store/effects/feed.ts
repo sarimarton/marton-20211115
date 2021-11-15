@@ -1,6 +1,6 @@
-import type { Event, Store } from 'src/store/store'
-import type { ApiDeltaMsg, ApiMsg } from 'src/store/types'
-import type { Middleware } from 'src/util-types'
+import type { Event, Store } from 'src/store/store';
+import type { ApiDeltaMsg, ApiMsg } from 'src/store/types';
+import type { Middleware } from 'src/util-types';
 
 let webSocket: WebSocket
 const queue: (() => void | boolean)[] = []
@@ -14,15 +14,8 @@ setInterval(() => {
 }, 200)
 
 const middleware: Middleware<Store, Event> = (api) => (next) => (event) => {
-  if (event.type === 'INIT' || event.type === 'FOCUSED') {
+  if (event.type === 'feed/CONNECT') {
     queue.push(
-      // Some tear down steps
-      () => webSocket?.close?.(),
-      () =>
-        Boolean(
-          !webSocket?.close || webSocket?.readyState === webSocket.CLOSED
-        ),
-      // Build up the connection
       () => {
         webSocket = new WebSocket('wss://www.cryptofacilities.com/ws/v1')
       },
@@ -37,7 +30,7 @@ const middleware: Middleware<Store, Event> = (api) => (next) => (event) => {
         )
       },
       () => {
-        api.dispatch({ type: 'CONNECTED' })
+        api.dispatch({ type: 'feed/CONNECTED' })
 
         webSocket.onmessage = function (event) {
           const data: ApiMsg = JSON.parse(event.data)
@@ -56,28 +49,21 @@ const middleware: Middleware<Store, Event> = (api) => (next) => (event) => {
     )
   }
 
-  if (event.type === 'BLURRED') {
-    queue.push(() => {
-      webSocket.close()
-    })
-  }
-
-  if (event.type === 'FEED_TOGGLED') {
+  if (event.type === 'feed/TEARDOWN') {
     const currentProductId = api.getState().main.productId
     queue.push(
       () => {
-        webSocket.send(
+        webSocket?.send(
           JSON.stringify({
             event: 'unsubscribe',
             feed: 'book_ui_1',
             product_ids: [currentProductId]
           })
         )
-        webSocket.close()
+        webSocket?.close()
       },
-      () => {
-        api.dispatch({ type: 'INIT' })
-      }
+      () =>
+        Boolean(!webSocket?.close || webSocket?.readyState === webSocket.CLOSED)
     )
   }
 

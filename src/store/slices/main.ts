@@ -1,22 +1,24 @@
 // I decided to not use redux's createSlice, because I prefer plain event
 // objects instead of 'action creators' due to their transparency. But I wanted
 // to avoid the infamous wordiness of traditional reducers, so I used Immer directly
-import produce from 'immer'
+import { AVLTree } from '@foxglove/avl';
+import produce from 'immer';
 import type {
   ApiDeltaMsg,
   ApiSnapshotMsg,
   Orderbook,
   Price,
   Size
-} from 'src/store/types'
-import { AVLTree } from '@foxglove/avl'
+} from 'src/store/types';
 
+// Imperative means request, past tense means occurred event
 export type MainEvent =
-  | { type: 'INIT' }
-  | { type: 'CONNECTED' }
-  | { type: 'BLURRED' }
-  | { type: 'FOCUSED' }
-  | { type: 'FEED_TOGGLED' }
+  | { type: 'feed/CONNECT' }
+  | { type: 'feed/CONNECTED' }
+  | { type: 'feed/TEARDOWN' }
+  | { type: 'app/BLURRED' }
+  | { type: 'app/FOCUSED' }
+  | { type: 'feed/TOGGLE' }
   | { type: 'SNAPSHOT_UPDATE'; data: ApiSnapshotMsg }
   | { type: 'DELTA_UPDATE'; data: ApiDeltaMsg }
   | { type: 'RENDER_TICK' }
@@ -83,23 +85,23 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
         }
         break
 
-      case 'INIT':
+      case 'feed/CONNECT':
         draft.state = 'connecting'
         break
 
-      case 'FOCUSED':
-        draft.state = 'connecting'
-        break
-
-      case 'BLURRED':
+      case 'app/BLURRED':
         draft.state = 'paused'
         break
 
-      case 'CONNECTED':
+      case 'feed/TEARDOWN':
+        draft.state = 'idle'
+        break
+
+      case 'feed/CONNECTED':
         draft.state = 'live'
         break
 
-      case 'FEED_TOGGLED':
+      case 'feed/TOGGLE':
         draft.productId =
           draft.productId === 'PI_XBTUSD' ? 'PI_ETHUSD' : 'PI_XBTUSD'
         break

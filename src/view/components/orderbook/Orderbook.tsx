@@ -13,7 +13,7 @@ export default function Orderbook({}: Props) {
   const state = useSelector((root) => root.main.state)
 
   useEffect(() => {
-    dispatch({ type: 'feed/CONNECT' })
+    dispatch({ type: 'feed/SUB' })
   }, [])
 
   return (

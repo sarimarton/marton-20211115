@@ -13,9 +13,8 @@ import type {
 
 // Imperative means request, past tense means occurred event
 export type MainEvent =
-  | { type: 'feed/CONNECT' }
-  | { type: 'feed/CONNECTED' }
-  | { type: 'feed/TEARDOWN' }
+  | { type: 'feed/SUB' }
+  | { type: 'feed/UNSUB' }
   | { type: 'feed/TOGGLE' }
   | { type: 'feed/SNAPSHOT_UPDATE'; data: ApiSnapshotMsg }
   | { type: 'feed/DELTA_UPDATE'; data: ApiDeltaMsg }
@@ -85,20 +84,16 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
         }
         break
 
-      case 'feed/CONNECT':
-        draft.state = 'connecting'
+      case 'feed/SUB':
+        draft.state = 'live'
         break
 
       case 'app/BLURRED':
         draft.state = 'paused'
         break
 
-      case 'feed/TEARDOWN':
+      case 'feed/UNSUB':
         draft.state = 'idle'
-        break
-
-      case 'feed/CONNECTED':
-        draft.state = 'live'
         break
 
       case 'feed/TOGGLE':

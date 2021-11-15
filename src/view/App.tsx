@@ -8,7 +8,7 @@ export default function App() {
   const isVisible = usePageVisibility()
 
   useEffect(() => {
-    dispatch({ type: 'feed/CONNECT' })
+    dispatch({ type: 'feed/SUB' })
   }, [])
 
   useEffect(() => {

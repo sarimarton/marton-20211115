@@ -17,9 +17,9 @@ const middleware: Middleware<Store, Event> = (api) => {
     }
 
     // A 40-ms render time of half of the panel results in a 400-ms throttle,
-    // sounds safe enough.
+    // seems safe enough.
     if (event.type === 'RENDER_TIME_UPDATE') {
-      throttledFn = throttle(fn, event.data * 10)
+      throttledFn = throttle(fn, Math.round(event.data * 10), { leading: false })
     }
 
     return next(event)

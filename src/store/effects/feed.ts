@@ -43,7 +43,6 @@ const middleware: Middleware<Store, Event> = (api) => (next) => (event) => {
               api.dispatch({ type: 'CONNECTED' })
 
               webSocket.onmessage = function (event) {
-                console.log(webSocket.readyState)
                 const data: ApiMsg = JSON.parse(event.data)
 
                 if (data.feed === 'book_ui_1_snapshot') {

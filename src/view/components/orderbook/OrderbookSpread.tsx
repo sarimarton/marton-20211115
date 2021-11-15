@@ -10,7 +10,7 @@ export default function OrderbookSpread(props: Props) {
   const feedState = useSelector((root) => root.main.state)
   const spread = useSelector(selectSpread)
 
-  return feedState !== 'live' ? (
+  return feedState !== 'live' || spread.price === 0 ? (
     <></>
   ) : (
     <div

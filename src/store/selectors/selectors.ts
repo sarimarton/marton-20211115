@@ -47,6 +47,6 @@ export const selectSpread = createSelector(
   selectFirst50Asks,
   (counter, bids, asks) => ({
     priceDiff: (asks[0]?.price || 0) - (bids[0]?.price || 0),
-    price: bids[0]?.price || 0
+    price: asks[0]?.price || 0
   })
 )

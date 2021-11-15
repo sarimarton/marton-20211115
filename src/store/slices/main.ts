@@ -20,18 +20,21 @@ export type MainEvent =
   | { type: 'SNAPSHOT_UPDATE'; data: ApiSnapshotMsg }
   | { type: 'DELTA_UPDATE'; data: ApiDeltaMsg }
   | { type: 'RENDER_TICK' }
+  | { type: 'RENDER_TIME_UPDATE'; data: number }
 
 export type MainSlice = {
   productId: 'PI_XBTUSD' | 'PI_ETHUSD'
   orderbook?: Orderbook
   updateCounter: number
   state: 'idle' | 'connecting' | 'live' | 'paused'
+  renderTime: number
 }
 
 const initialState: MainSlice = {
   productId: 'PI_XBTUSD',
   updateCounter: 0,
-  state: 'idle'
+  state: 'idle',
+  renderTime: 0
 }
 
 const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
@@ -99,6 +102,10 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
       case 'FEED_TOGGLED':
         draft.productId =
           draft.productId === 'PI_XBTUSD' ? 'PI_ETHUSD' : 'PI_XBTUSD'
+        break
+
+      case 'RENDER_TIME_UPDATE':
+        draft.renderTime = event.data
         break
     }
   })

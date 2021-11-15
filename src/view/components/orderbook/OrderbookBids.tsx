@@ -1,6 +1,6 @@
-import React from 'react'
-import { selectFirst50Bids } from 'src/store/selectors/selectors';
-import { useSelector } from 'src/store/store'
+import React, { useEffect } from 'react'
+import { selectFirst50Bids } from 'src/store/selectors/selectors'
+import { useDispatch, useSelector } from 'src/store/store'
 import OrderbookRow from './OrderbookRow'
 import OrderbookRowHeader from './OrderbookRowHeader'
 
@@ -10,7 +10,14 @@ interface Props {
 }
 
 export default function OrderbookBids(props: Props) {
+  const dispatch = useDispatch()
   const bids = useSelector(selectFirst50Bids)
+
+  // Absolutely rudimentary performance measurement of render+paint
+  const start = performance.now()
+  useEffect(() => {
+    dispatch({ type: 'RENDER_TIME_UPDATE', data: performance.now() - start })
+  })
 
   return (
     <div

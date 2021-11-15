@@ -16,13 +16,13 @@ export type MainEvent =
   | { type: 'feed/CONNECT' }
   | { type: 'feed/CONNECTED' }
   | { type: 'feed/TEARDOWN' }
+  | { type: 'feed/TOGGLE' }
+  | { type: 'feed/SNAPSHOT_UPDATE'; data: ApiSnapshotMsg }
+  | { type: 'feed/DELTA_UPDATE'; data: ApiDeltaMsg }
+  | { type: 'app/RENDER_TICK' }
+  | { type: 'app/RENDER_TIME_UPDATE'; data: number }
   | { type: 'app/BLURRED' }
   | { type: 'app/FOCUSED' }
-  | { type: 'feed/TOGGLE' }
-  | { type: 'SNAPSHOT_UPDATE'; data: ApiSnapshotMsg }
-  | { type: 'DELTA_UPDATE'; data: ApiDeltaMsg }
-  | { type: 'RENDER_TICK' }
-  | { type: 'RENDER_TIME_UPDATE'; data: number }
 
 export type MainSlice = {
   productId: 'PI_XBTUSD' | 'PI_ETHUSD'
@@ -42,7 +42,7 @@ const initialState: MainSlice = {
 const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
   produce(state, (draft) => {
     switch (event.type) {
-      case 'SNAPSHOT_UPDATE':
+      case 'feed/SNAPSHOT_UPDATE':
         const bidsTree = new AVLTree<Price, Size>()
         for (const order of event.data.bids) {
           bidsTree.set(order[0], order[1])
@@ -61,7 +61,7 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
 
         break
 
-      case 'DELTA_UPDATE':
+      case 'feed/DELTA_UPDATE':
         for (const order of event.data.bids) {
           if (order[1] === 0) {
             draft.orderbook!.bids.delete(order[0])
@@ -79,7 +79,7 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
         }
         break
 
-      case 'RENDER_TICK':
+      case 'app/RENDER_TICK':
         if (state.state === 'live') {
           draft.updateCounter += 1
         }
@@ -106,7 +106,7 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
           draft.productId === 'PI_XBTUSD' ? 'PI_ETHUSD' : 'PI_XBTUSD'
         break
 
-      case 'RENDER_TIME_UPDATE':
+      case 'app/RENDER_TIME_UPDATE':
         draft.renderTime = event.data
         break
     }

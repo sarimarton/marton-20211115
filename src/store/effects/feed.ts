@@ -36,11 +36,11 @@ const middleware: Middleware<Store, Event> = (api) => (next) => (event) => {
           const data: ApiMsg = JSON.parse(event.data)
 
           if (data.feed === 'book_ui_1_snapshot') {
-            api.dispatch({ type: 'SNAPSHOT_UPDATE', data })
+            api.dispatch({ type: 'feed/SNAPSHOT_UPDATE', data })
             // @ts-ignore
           } else if (data.feed === 'book_ui_1' && !data.event) {
             api.dispatch({
-              type: 'DELTA_UPDATE',
+              type: 'feed/DELTA_UPDATE',
               data: data as ApiDeltaMsg
             })
           }

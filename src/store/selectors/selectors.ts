@@ -1,6 +1,8 @@
 import { createSelector } from 'reselect'
 import type { Store } from 'src/store/store'
 
+const depth = 50
+
 export const selectFirst50Bids = createSelector(
   (root: Store) => root.main.updateCounter,
   (root: Store) => root.main.orderbook?.bids,
@@ -8,7 +10,7 @@ export const selectFirst50Bids = createSelector(
     let entries = []
     let entry = tree?.maxEntry()
     let total = 0
-    while (entry && entries.length < 50) {
+    while (entry && entries.length < depth) {
       total += entry[1]
       entries.push({ price: entry[0], size: entry[1], total })
       entry = tree!.findLessThan(entry[0])
@@ -24,7 +26,7 @@ export const selectFirst50Asks = createSelector(
     let entries = []
     let entry = tree?.minEntry()
     let total = 0
-    while (entry && entries.length < 50) {
+    while (entry && entries.length < depth) {
       total += entry[1]
       entries.push({ price: entry[0], size: entry[1], total })
       entry = tree!.findGreaterThan(entry[0])

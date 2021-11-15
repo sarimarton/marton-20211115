@@ -3,23 +3,7 @@ import type { Store } from 'src/store/store'
 
 export const selectFirst50Bids = createSelector(
   (root: Store) => root.main.updateCounter,
-  (root: Store) => root.main.orderbook.bids,
-  (counter, tree) => {
-    let entries = []
-    let entry = tree?.minEntry()
-    let total = 0
-    while (entry && entries.length < 50) {
-      total += entry[1]
-      entries.push({ price: entry[0], size: entry[1], total })
-      entry = tree!.findGreaterThan(entry[0])
-    }
-    return entries
-  }
-)
-
-export const selectFirst50Asks = createSelector(
-  (root: Store) => root.main.updateCounter,
-  (root: Store) => root.main.orderbook.bids,
+  (root: Store) => root.main.orderbook?.bids,
   (counter, tree) => {
     let entries = []
     let entry = tree?.maxEntry()
@@ -28,6 +12,22 @@ export const selectFirst50Asks = createSelector(
       total += entry[1]
       entries.push({ price: entry[0], size: entry[1], total })
       entry = tree!.findLessThan(entry[0])
+    }
+    return entries
+  }
+)
+
+export const selectFirst50Asks = createSelector(
+  (root: Store) => root.main.updateCounter,
+  (root: Store) => root.main.orderbook?.bids,
+  (counter, tree) => {
+    let entries = []
+    let entry = tree?.minEntry()
+    let total = 0
+    while (entry && entries.length < 50) {
+      total += entry[1]
+      entries.push({ price: entry[0], size: entry[1], total })
+      entry = tree!.findGreaterThan(entry[0])
     }
     return entries
   }
@@ -47,6 +47,6 @@ export const selectSpread = createSelector(
   selectFirst50Asks,
   (counter, bids, asks) => ({
     priceDiff: (asks[0]?.price || 0) - (bids[0]?.price || 0),
-    price: asks[0]?.price || 0
+    price: bids[0]?.price || 0
   })
 )

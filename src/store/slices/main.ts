@@ -3,8 +3,8 @@
 // to avoid the infamous wordiness of traditional reducers, so I used Immer directly
 import produce from 'immer'
 import type {
-  ApiOrder,
-  ApiOrderbook,
+  ApiDeltaMsg,
+  ApiSnapshotMsg,
   Orderbook,
   Price,
   Size
@@ -14,21 +14,22 @@ import { AVLTree } from '@foxglove/avl'
 
 export type MainEvent =
   | { type: 'INIT' }
-  | { type: 'SNAPSHOT_UPDATE'; data: ApiOrderbook }
-  | { type: 'DELTA_UPDATE'; data: ApiOrderbook }
+  | { type: 'BLURRED' }
+  | { type: 'FOCUSED' }
+  | { type: 'SNAPSHOT_UPDATE'; data: ApiSnapshotMsg }
+  | { type: 'DELTA_UPDATE'; data: ApiDeltaMsg }
 
 export type MainSlice = {
-  orderbook: Orderbook
+  productId: 'PI_XBTUSD' | 'PI_ETHUSD'
+  orderbook?: Orderbook
   updateCounter: number
+  state: 'idle' | 'live' | 'paused'
 }
 
 const initialState: MainSlice = {
-  orderbook: {
-    numLevels: 25,
-    feed: '',
-    product_id: 'PI_XBTUSD'
-  },
-  updateCounter: 0
+  productId: 'PI_XBTUSD',
+  updateCounter: 0,
+  state: 'idle'
 }
 
 const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
@@ -41,7 +42,7 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
         }
 
         const asksTree = new AVLTree<Price, Size>()
-        for (const order of event.data.bids) {
+        for (const order of event.data.asks) {
           asksTree.set(order[0], order[1])
         }
 
@@ -54,26 +55,32 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
         break
 
       case 'DELTA_UPDATE':
-        draft.orderbook.feed = event.data.feed
-
         for (const order of event.data.bids) {
           if (order[1] === 0) {
-            draft.orderbook.bids!.delete(order[0])
+            draft.orderbook!.bids.delete(order[0])
           } else {
-            draft.orderbook.bids!.set(order[0], order[1])
+            draft.orderbook!.bids.set(order[0], order[1])
           }
           draft.updateCounter++
         }
 
         for (const order of event.data.asks) {
           if (order[1] === 0) {
-            draft.orderbook.asks!.delete(order[0])
+            draft.orderbook!.asks.delete(order[0])
           } else {
-            draft.orderbook.asks!.set(order[0], order[1])
+            draft.orderbook!.asks.set(order[0], order[1])
           }
           draft.updateCounter++
         }
 
+        break
+
+      case 'BLURRED':
+        draft.state = 'paused'
+        break
+
+      case 'FOCUSED':
+        draft.state = 'live'
         break
     }
   })

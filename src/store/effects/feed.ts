@@ -3,65 +3,55 @@ import type { ApiDeltaMsg, ApiMsg } from 'src/store/types'
 import type { Middleware } from 'src/util-types'
 
 let webSocket: WebSocket
-const queue: (() => boolean)[] = []
+const queue: (() => void | boolean)[] = []
 
+// Basic queue manager. It's polling, and shifts the queue unless the
+// current item returns false. It could've been done with an event listener.
 setInterval(() => {
-  while (queue.length && queue[0]()) {
+  while (queue.length && queue[0]() !== false) {
     queue.shift()
   }
-}, 250)
+}, 200)
 
 const middleware: Middleware<Store, Event> = (api) => (next) => (event) => {
   if (event.type === 'INIT' || event.type === 'FOCUSED') {
     queue.push(
       // Some tear down steps
-      () => {
-        webSocket?.close?.()
-        return true
-      },
-      () => {
-        return !webSocket?.close || webSocket?.readyState === webSocket.CLOSED
-      },
+      () => webSocket?.close?.(),
+      () =>
+        Boolean(
+          !webSocket?.close || webSocket?.readyState === webSocket.CLOSED
+        ),
+      // Build up the connection
       () => {
         webSocket = new WebSocket('wss://www.cryptofacilities.com/ws/v1')
-        webSocket.onopen = function (event) {
-          queue.push(
-            () => {
-              return webSocket.readyState === WebSocket.OPEN
-            },
-            () => {
-              webSocket.send(
-                JSON.stringify({
-                  event: 'subscribe',
-                  feed: 'book_ui_1',
-                  product_ids: [api.getState().main.productId]
-                })
-              )
-              return true
-            },
-            () => {
-              api.dispatch({ type: 'CONNECTED' })
+      },
+      () => webSocket.readyState === WebSocket.OPEN,
+      () => {
+        webSocket.send(
+          JSON.stringify({
+            event: 'subscribe',
+            feed: 'book_ui_1',
+            product_ids: [api.getState().main.productId]
+          })
+        )
+      },
+      () => {
+        api.dispatch({ type: 'CONNECTED' })
 
-              webSocket.onmessage = function (event) {
-                const data: ApiMsg = JSON.parse(event.data)
+        webSocket.onmessage = function (event) {
+          const data: ApiMsg = JSON.parse(event.data)
 
-                if (data.feed === 'book_ui_1_snapshot') {
-                  api.dispatch({ type: 'SNAPSHOT_UPDATE', data })
-                  // @ts-ignore
-                } else if (data.feed === 'book_ui_1' && !data.event) {
-                  api.dispatch({
-                    type: 'DELTA_UPDATE',
-                    data: data as ApiDeltaMsg
-                  })
-                }
-              }
-
-              return true
-            }
-          )
+          if (data.feed === 'book_ui_1_snapshot') {
+            api.dispatch({ type: 'SNAPSHOT_UPDATE', data })
+            // @ts-ignore
+          } else if (data.feed === 'book_ui_1' && !data.event) {
+            api.dispatch({
+              type: 'DELTA_UPDATE',
+              data: data as ApiDeltaMsg
+            })
+          }
         }
-
-        return true
       }
     )
   }
@@ -69,7 +59,6 @@ const middleware: Middleware<Store, Event> = (api) => (next) => (event) => {
   if (event.type === 'BLURRED') {
     queue.push(() => {
       webSocket.close()
-      return true
     })
   }
 
@@ -85,11 +74,9 @@ const middleware: Middleware<Store, Event> = (api) => (next) => (event) => {
           })
         )
         webSocket.close()
-        return true
       },
       () => {
         api.dispatch({ type: 'INIT' })
-        return true
       }
     )
   }

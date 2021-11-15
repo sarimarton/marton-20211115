@@ -8,7 +8,7 @@ export const selectFirst50Bids = createSelector(
     let entries = []
     let entry = tree?.maxEntry()
     let total = 0
-    while (entry && entries.length < 25) {
+    while (entry && entries.length < 50) {
       total += entry[1]
       entries.push({ price: entry[0], size: entry[1], total })
       entry = tree!.findLessThan(entry[0])
@@ -24,7 +24,7 @@ export const selectFirst50Asks = createSelector(
     let entries = []
     let entry = tree?.minEntry()
     let total = 0
-    while (entry && entries.length < 25) {
+    while (entry && entries.length < 50) {
       total += entry[1]
       entries.push({ price: entry[0], size: entry[1], total })
       entry = tree!.findGreaterThan(entry[0])

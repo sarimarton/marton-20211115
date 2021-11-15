@@ -1,6 +1,7 @@
 import React from 'react'
-import { selectFirst50Asks } from 'src/store/selectors/selectors';
+import { selectFirst50Asks } from 'src/store/selectors/selectors'
 import { useSelector } from 'src/store/store'
+import format from 'src/view/utils/formatNumber'
 import OrderbookRow from './OrderbookRow'
 import OrderbookRowHeader from './OrderbookRowHeader'
 
@@ -31,7 +32,7 @@ export default function OrderbookAsks(props: Props) {
                 key={ask.price}
                 className=""
                 price={
-                  <span className="text-red-500">{ask.price.toFixed(2)}</span>
+                  <span className="text-red-500">{format(ask.price, 2)}</span>
                 }
                 size={ask.size}
                 total={ask.total}

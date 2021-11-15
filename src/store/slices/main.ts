@@ -75,7 +75,14 @@ const mainReducer = (state: MainSlice = initialState, event: MainEvent) =>
         break
 
       case 'RENDER_TICK':
-        draft.updateCounter++
+        if (state.state === 'live') {
+          draft.updateCounter += 1
+        }
+        break
+
+      case 'INIT':
+        draft.state = 'connecting'
+        break
 
       case 'FOCUSED':
         draft.state = 'connecting'

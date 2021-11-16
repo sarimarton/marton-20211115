@@ -1,11 +1,7 @@
 # marton-20211115
 
-- [Live Demo](https://b51d3.sse.codesandbox.io/)
-- [Live Demo with editor](https://codesandbox.io/s/github/sarimarton/orderbook)
-
-- If the above doesn't work, possibly it'll work at [here](https://codesandbox.io/s/github/sarimarton/marton-20211115). (I just renamed the repo recently, codesandbox seems to cache the old one.
-
-- (Quick update: the links are not working at the moment, working on it)
+- [Live Demo](https://535mz.sse.codesandbox.io/)
+- [Live Demo with editor](https://codesandbox.io/s/github/sarimarton/marton-20211115)
 
 ## Available Scripts
 
